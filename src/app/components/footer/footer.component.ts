@@ -5,35 +5,41 @@ import { Task } from 'src/app/models/task.model';
 import { TaskService } from 'src/app/services/task.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
+  selector: 'app-footer',
+  templateUrl: './footer.component.html',
+  styleUrls: ['./footer.component.css'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class FooterComponent implements OnInit, OnDestroy {
   private taskService = inject(TaskService);
-  private route = inject(ActivatedRoute);
-  subs: Subscription[] = [];
 
   tasks: Task[] = [];
+  subs: Subscription[] = [];
+  pendingTasks: number = 0;
   filter: string = '';
-
-  constructor() {}
 
   ngOnInit(): void {
     this.subs.push(
-      this.taskService.tasks$.subscribe((tasks) => {
+      this.taskService.filteredTasks$.subscribe((tasks) => {
         this.tasks = tasks;
+        this.pendingTasks = tasks.reduce(
+          (count, task) => (task.completed ? count : ++count),
+          0
+        );
       })
     );
 
     this.subs.push(
-      this.route.params.subscribe((params) => {
-        this.filter = params['filter'];
-        this.taskService.setFilter(this.filter);
+      this.taskService.filter$.subscribe((filter) => {
+        this.filter = filter;
       })
     );
   }
 
   ngOnDestroy(): void {
     this.subs.forEach((sub) => sub.unsubscribe());
+  }
+
+  clearCompleted() {
+    this.taskService.clearCompleted();
   }
 }

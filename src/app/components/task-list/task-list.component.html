@@ -1,0 +1,26 @@
+<section class="main">
+  <ul class="todo-list">
+    <li
+      *ngFor="let task of tasks; let index = index"
+      [class.completed]="task.completed"
+      [class.editing]="index === editingTask"
+    >
+      <div class="view">
+        <input
+          class="toggle"
+          type="checkbox"
+          [checked]="task.completed"
+          (change)="toggleTaskStatus(index)"
+        />
+        <label (dblclick)="editTask(index)">{{ task.title }}</label>
+        <button class="destroy" (click)="deleteTask(index)"></button>
+      </div>
+      <input
+        class="edit"
+        value="{{ task.title }}"
+        (keyup.esc)="cancelEdit()"
+        (keyup.enter)="saveTask($event)"
+      />
+    </li>
+  </ul>
+</section>
